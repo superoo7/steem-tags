@@ -5,9 +5,9 @@ import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import routes from './routes';
-
 dotenv.config();
+
+import routes from './routes';
 
 let app = express();
 
@@ -33,7 +33,7 @@ const corsOptions =
         methods: 'GET,PUT,POST,DELETE'
       };
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(morgan('combined'));
 app.use(
   bodyParser.json({
