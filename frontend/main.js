@@ -1,10 +1,6 @@
 // Variables
-var URL = 'http://en.wikipedia.org/w/api.php';
-var time = 500;
-
-// Keys
-var input = document.getElementById('input');
-var results = document.getElementById('results');
+var URL = 'https://backend-gpreewhcgk.now.sh/v1/tag/';
+// var time = 1500;
 
 /* Only get the value from each key up */
 var keyups = Rx.Observable.fromEvent(input, 'keyup')
@@ -12,7 +8,7 @@ var keyups = Rx.Observable.fromEvent(input, 'keyup')
     .filter(text => text.length > 3);
 
 /* Now throttle/debounce the input for 500ms */
-var throttled = keyups.throttleTime(time);
+var throttled = keyups.throttleTime(500 /* ms */);
 
 /* Now get only distinct values, so we eliminate the arrows and other control characters */
 var distinct = throttled.distinctUntilChanged();
@@ -21,16 +17,34 @@ var suggestions = distinct.switchMap(searchWikipedia);
 
 suggestions.subscribe(
     data => {
-        var res = data[1];
-        var link = data[3];
-        var disp = res.map((x, i) => [x, link[i]]);
-        console.log(disp);
-        results.innerHTML = '';
-        disp.map(value => {
-            results.innerHTML += `<li><a href="${value[1]}" target="_blank">${
-                value[0]
-            }</a></li>`;
-        });
+        if (data === [] || typeof data != 'object') {
+            results.innerHTML = `<li>FAILED TO FIND THAT TAG</li>`;
+        } else {
+            results.innerHTML = '';
+            data.map(function(val, counter) {
+                results.innerHTML += `<li>${counter +
+                    1} <a href="${'https://steemit.com' +
+                    val.url}" target="_blank">${val.Titles}</a><br/>by ${
+                    val.author
+                } <br/>${val.Votes} upvotes, ${val.PendingPayouts}</li>`;
+            });
+
+            var price = document.getElementById('price');
+            var post = document.getElementById('post');
+            var upvote = document.getElementById('upvote');
+
+            var totalData = data.reduce((a, b) => ({
+                PendingPayouts: a.PendingPayouts + b.PendingPayouts,
+                Votes: a.Votes + b.Votes
+            }));
+            totalData.Posts = data.length;
+
+            console.log(totalData);
+
+            price.innerHTML = totalData.PendingPayouts;
+            upvote.innerHTML = totalData.Votes;
+            post.innerHTML = totalData.Posts;
+        }
     },
     error => {
         results.innerHTML = '';
@@ -39,14 +53,16 @@ suggestions.subscribe(
 );
 
 function searchWikipedia(term) {
-    console.log(term);
-    return $.ajax({
-        url: URL,
-        dataType: 'jsonp',
-        data: {
-            action: 'opensearch',
-            format: 'json',
-            search: term
-        }
-    }).promise();
+    var link = URL + term;
+    console.log(link);
+    results.innerHTML = 'Loading...';
+
+    return fetch(link, { method: 'GET', mode: 'cors' })
+        .then(function(res) {
+            return res.json();
+        })
+        .then(function(data) {
+            console.log(data);
+            return data;
+        });
 }

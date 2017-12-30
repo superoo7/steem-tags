@@ -20,7 +20,7 @@
         }
 
         .center {
-            background: green;
+            background: lightgreen;
             width: 100%;
             padding: 10px;
         }
@@ -40,13 +40,19 @@
 
     <div class="center">
         <h1>Steem MVP</h1>
-        <input type="text" id="input">
+        <input name="input" type="text" id="input">
+        <!-- <button id="submit">SUBMIT</button> -->
+        <div id="data">
+            <div class="price">Total Pending Payout: <span id="price"></span></div>
+            <div class="post">Total Post: <span id="post"></span></div>
+            <div class="upvote">Total Upvote: <span id="upvote"></span></div>
+        </div>
         <ul id="results">
 
         </ul>
     </div>
 
-    <script src="http://code.jquery.com/jquery.js"></script>
+    <!-- <script src="http://code.jquery.com/jquery.js"></script> -->
     <script src="./rx.js"></script>
     <script src="./main.js"></script>
 </body>
